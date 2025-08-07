@@ -79,7 +79,7 @@ const Filterbar = () => {
                           childParamName.charAt(0).toLowerCase() +
                           childParamName.slice(1);
                         if (child.name === "Consult type")
-                          childParamName = "consultType"; // Specific override
+                          childParamName = "consultType"; 
 
                         return searchParams.has(childParamName)
                           ? count + 1

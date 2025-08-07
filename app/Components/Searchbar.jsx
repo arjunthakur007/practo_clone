@@ -85,7 +85,7 @@ const Searchbar = () => {
             </div>
           </button>
           {specialityDropdown && (
-             <div className="absolute top-full left-0 mt-2 w-full bg-white border border-gray-300 shadow-lg z-10 max-h-60 overflow-y-auto">
+            <div className="absolute top-full left-0 mt-2 w-full bg-white border border-gray-300 shadow-lg z-10 max-h-60 overflow-y-auto">
               <ul>
                 {specialties.map((speciality) => (
                   <li

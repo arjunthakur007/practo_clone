@@ -56,8 +56,8 @@ const Navbar = () => {
                 >
                   {link.name}
                   {/* Dropdown arrow icon*/}
-                 
-                  <ChevronDown  className="w-4 transform group-hover:rotate-180 transition-transform"/>
+
+                  <ChevronDown className="w-4 transform group-hover:rotate-180 transition-transform" />
                 </a>
                 <div className="absolute hidden group-hover:block bg-white shadow-lg rounded-md py-2 w-48 z-10">
                   {link.children.map((childLink) => (

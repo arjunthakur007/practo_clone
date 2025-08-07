@@ -22,7 +22,7 @@ export async function GET(request) {
 
     const { searchParams } = new URL(request.url);
 
-    // query parameters
+    // Query parameters
     const specialityParam = searchParams.get("speciality");
     const cityParam = searchParams.get("city");
     const genderParam = searchParams.get("gender");
@@ -35,7 +35,7 @@ export async function GET(request) {
 
     let filteredDoctors = [...doctors];
 
-    //Speciality
+    //Speciality filter
     if (specialityParam) {
       const formattedSpeciality = formatText(specialityParam);
       filteredDoctors = filteredDoctors.filter(
@@ -64,9 +64,9 @@ export async function GET(request) {
       );
     }
 
-    //  Additional Filters
+    //  Additional filters
 
-    // Gender Filter
+    // Gender filter
     if (genderParam) {
       const formattedGender = formatText(genderParam);
       filteredDoctors = filteredDoctors.filter((doctor) => {
@@ -75,13 +75,13 @@ export async function GET(request) {
         } else if (formattedGender === "Female Doctor") {
           return doctor.gender === "Female";
         }
-        return true; // If somehow an invalid gender is passed, don't filter
+        return true; 
       });
     }
 
-    // Patient Stories Filter (e.g., "10+ Patient Stories")
+    // Patient stories 
     if (patientStoriesParam) {
-      const minStories = parseInt(patientStoriesParam.split("+")[0]); // Extract number, e.g., 10
+      const minStories = parseInt(patientStoriesParam.split("+")[0]); 
       if (!isNaN(minStories)) {
         filteredDoctors = filteredDoctors.filter(
           (doctor) => doctor.numPatientStories >= minStories
@@ -89,9 +89,9 @@ export async function GET(request) {
       }
     }
 
-    // Experience Filter (e.g., "5+ Years")
+    // Experience filter 
     if (experienceParam) {
-      const minExperience = parseInt(experienceParam.split("+")[0]); // Extract number, e.g., 5
+      const minExperience = parseInt(experienceParam.split("+")[0]);
       if (!isNaN(minExperience)) {
         filteredDoctors = filteredDoctors.filter(
           (doctor) => doctor.experienceYears >= minExperience
@@ -99,54 +99,52 @@ export async function GET(request) {
       }
     }
 
-    // Fees Filter (e.g., "₹0-₹500", "Above ₹500")
+    // Fees Filter 
     if (feesParam) {
       filteredDoctors = filteredDoctors.filter((doctor) => {
         const fee = doctor.consultationFee;
         if (feesParam.includes("₹0-₹500")) {
           return fee >= 0 && fee <= 500;
         } else if (feesParam.includes("Above ₹500")) {
-          return fee > 500 && fee <= 1000; // Assuming a range for 'Above ₹500' up to 1000 for simplicity
+          return fee > 500 && fee <= 1000; 
         } else if (feesParam.includes("Above ₹1000")) {
-          return fee > 1000 && fee <= 2000; // Assuming a range for 'Above ₹1000' up to 2000
+          return fee > 1000 && fee <= 2000;
         } else if (feesParam.includes("Above ₹2000")) {
           return fee > 2000;
         }
-        return true; // No filter applied if param is unrecognized
+        return true; 
       });
     }
 
-    // Availability Filter (e.g., "Available in next 4 hours", "Available Today")
-    // This is a simplified logic as actual availability requires a more complex system (dates, slots)
+    // Availability filter 
     if (availabilityParam) {
       filteredDoctors = filteredDoctors.filter((doctor) => {
         if (availabilityParam === "Available in next 4 hours") {
-          return doctor.availability <= 4; // doctor.availability represents hours from now
+          return doctor.availability <= 4; 
         } else if (availabilityParam === "Available Today") {
-          return doctor.availability <= 24; // Assuming availability within 24 hours
+          return doctor.availability <= 24;
         } else if (availabilityParam === "Available Tomorrow") {
-          return doctor.availability > 24 && doctor.availability <= 48; // Assuming availability between 24 and 48 hours
+          return doctor.availability > 24 && doctor.availability <= 48; 
         } else if (availabilityParam === "Available in next 7 days") {
-          return doctor.availability <= 7 * 24; // Assuming availability within 7 days
+          return doctor.availability <= 7 * 24; 
         }
         return true;
       });
     }
 
-    // Consult Type Filter (e.g., "Video consult")
-    // Assuming 'videoConsult' is a boolean field in doctor object, or implied by availability
-    // For now, we'll assume a doctor is available for video consult if their availability is > 0
+   
+    //assuming a doctor is available for video consult if their availability is > 0
     if (consultTypeParam === "Video consult") {
       filteredDoctors = filteredDoctors.filter(
         (doctor) => doctor.availability > 0
-      ); // Simplified: if they have any availability, they can video consult
+      );
     }
 
-    // --- Apply Sorting ---
+    //  Apply Sorting
     if (sortByParam) {
       switch (sortByParam) {
         case "Relevance":
-          // No specific sorting for relevance, keep original order or apply default
+          
           break;
         case "Number of patient stories - High to low":
           filteredDoctors.sort(
@@ -163,18 +161,16 @@ export async function GET(request) {
           filteredDoctors.sort((a, b) => a.consultationFee - b.consultationFee);
           break;
         default:
-          // No sorting or default sorting
           break;
       }
     }
 
-    // Return the filtered and sorted list of doctors
+    // Response object
     return new Response(
       JSON.stringify({
         doctors: filteredDoctors,
         city: formatText(cityParam),
         speciality: formatText(specialityParam),
-        // Include other applied filters in response for debugging/feedback if needed
         appliedFilters: {
           gender: genderParam,
           patientStories: patientStoriesParam,
